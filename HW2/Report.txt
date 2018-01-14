@@ -1,0 +1,110 @@
+=> Report
+
+In order to implement the program help was taken from the following links:
+
+1) http://www.opensourceforu.com/2011/02/capturing-packets-c-program-libpcap/
+for understanding basic packet capture techniques.
+2) http://www.gnu.org/software/libc/manual/html_node/Getopt.html
+3) http://www.tcpdump.org/sniffex.c
+
+Implementation:
+
+Ethernet, IP, TCP and UDP header structs are defined with member variables in order of offsets of each header bytes.
+
+A callback function is implemented for the pcap loop which parses the packets for the ethernet, IP, TCP/UDP headers to get the 
+required information and prints out the timestamp, source and destination MAC address, EtherType, packet length, source and 
+destination IP address and port and protocol type.
+
+Example:
+
+1) make clean && make && sudo ./mydump -r hw1.pcap -s Broadcom | grep Broadcom | head
+
+rm -f mydump.o
+rm -f mydump
+gcc -c -w mydump.c -o mydump.o
+gcc mydump.o -lpcap -o mydump
+interface = (null) , file = hw1.pcap, string = Broadcom 
+31 2e 30 20 42 72 6f 61  64 63 6f 6d 20 55 50 6e 50 20 53 74 61 63 6b 2f    1.0 Broadcom UPnP Stack/
+31 2e 30 20 42 72 6f 61  64 63 6f 6d 20 55 50 6e 50 20 53 74 61 63 6b 2f    1.0 Broadcom UPnP Stack/
+31 2e 30 20 42 72 6f 61  64 63 6f 6d 20 55 50 6e 50 20 53 74 61 63 6b 2f    1.0 Broadcom UPnP Stack/
+31 2e 30 20 42 72 6f 61  64 63 6f 6d 20 55 50 6e 50 20 53 74 61 63 6b 2f    1.0 Broadcom UPnP Stack/
+31 2e 30 20 42 72 6f 61  64 63 6f 6d 20 55 50 6e 50 20 53 74 61 63 6b 2f    1.0 Broadcom UPnP Stack/
+31 2e 30 20 42 72 6f 61  64 63 6f 6d 20 55 50 6e 50 20 53 74 61 63 6b 2f    1.0 Broadcom UPnP Stack/
+31 2e 30 20 42 72 6f 61  64 63 6f 6d 20 55 50 6e 50 20 53 74 61 63 6b 2f    1.0 Broadcom UPnP Stack/
+31 2e 30 20 42 72 6f 61  64 63 6f 6d 20 55 50 6e 50 20 53 74 61 63 6b 2f    1.0 Broadcom UPnP Stack/
+31 2e 30 20 42 72 6f 61  64 63 6f 6d 20 55 50 6e 50 20 53 74 61 63 6b 2f    1.0 Broadcom UPnP Stack/
+
+2) make clean && make && sudo ./mydump -r hw1.pcap tcp | head
+
+rm -f mydump.o
+rm -f mydump
+gcc -c -w mydump.c -o mydump.o
+gcc mydump.o -lpcap -o mydump
+interface = (null) , file = hw1.pcap, string = (null) 
+Expression filter: tcp 
+Time: 2013-01-12 14:35:49  Source MAC address: c4:3d:c7:17:6f:9b Destination MAC address 0:c:29:e9:94:8e Ethernet Type: 8 Length: 88 74 122.154.101.54: 39437 -> 192.168.0.200: 443 Protocol Type: TCP 
+9a 0d 01 bb 84 a0 00 fc  00 00 00 00 a0 02 16 d0 ee 6c 00 00 02 04 05 b4    .................l......
+04 02 08 0a 08 75 77 a8  00 00 00 00 01 03 03 07    .....uw.........
+Time: 2013-01-12 14:35:49  Source MAC address: 0:c:29:e9:94:8e Destination MAC address c4:3d:c7:17:6f:9b Ethernet Type: 8 Length: 88 74 192.168.0.200: 443 -> 122.154.101.54: 39437 Protocol Type: TCP 
+01 bb 9a 0d db c2 57 d2  84 a0 00 fd a0 12 38 90 a1 6f 00 00 02 04 05 b4    ......W.......8..o......
+04 02 08 0a 00 32 35 1a  08 75 77 a8 01 03 03 04    .....25..uw.....
+Time: 2013-01-12 14:35:49  Source MAC address: c4:3d:c7:17:6f:9b Destination MAC address 0:c:29:e9:94:8e Ethernet Type: 8 Length: 80 66 122.154.101.54: 39437 -> 192.168.0.200: 443 Protocol Type: TCP 
+9a 0d 01 bb 84 a0 00 fd  db c2 57 d3 80 10 00 2e c9 87 00 00 01 01 08 0a    ..........W.............
+
+
+3) make clean && make && sudo ./mydump -i en0 'dst port 80'
+
+rm -f mydump.o
+rm -f mydump
+gcc -c -w mydump.c -o mydump.o
+gcc mydump.o -lpcap -o mydump
+interface = en0 , file = (null), string = (null) 
+Expression filter: dst port 80 
+Time: 2017-10-14 03:42:13  Source MAC address: 78:4f:43:a7:21:5d Destination MAC address b8:af:67:63:a3:28 Ethernet Type: 8 Length: 92 78 172.24.18.67: 51949 -> 130.245.27.3: 80 Protocol Type: TCP 
+ca ed 00 50 1e 97 18 9c  00 00 00 00 b0 02 ff ff d4 89 00 00 02 04 05 b4    ...P....................
+01 03 03 05 01 01 08 0a  21 2c e2 82 00 00 00 00 04 02 00 00    ........!,..........
+Time: 2017-10-14 03:42:13  Source MAC address: 78:4f:43:a7:21:5d Destination MAC address b8:af:67:63:a3:28 Ethernet Type: 8 Length: 80 66 172.24.18.67: 51949 -> 130.245.27.3: 80 Protocol Type: TCP 
+ca ed 00 50 1e 97 18 9d  24 41 73 3e 80 10 10 1a 7c 5e 00 00 01 01 08 0a    ...P....$As>....|^......
+21 2c e2 86 e8 0f 08 3d                             !,.....=
+Time: 2017-10-14 03:42:13  Source MAC address: 78:4f:43:a7:21:5d Destination MAC address b8:af:67:63:a3:28 Ethernet Type: 8 Length: 922 908 172.24.18.67: 51949 -> 130.245.27.3: 80 Protocol Type: TCP 
+ca ed 00 50 1e 97 18 9d  24 41 73 3e 80 18 10 1a 37 ba 00 00 01 01 08 0a    ...P....$As>....7.......
+21 2c e2 87 e8 0f 08 3d  47 45 54 20 2f 7e 6d 69 6b 65 70 6f 2f 43 53 45    !,.....=GET /~mikepo/CSE
+35 30 38 2f 32 30 31 37  2f 68 77 2f 43 53 45 35 30 38 5f 32 30 31 37 5f    508/2017/hw/CSE508_2017_
+68 77 32 2e 74 78 74 20  48 54 54 50 2f 31 2e 31 0d 0a 48 6f 73 74 3a 20    hw2.txt HTTP/1.1..Host: 
+77 77 77 33 2e 63 73 2e  73 74 6f 6e 79 62 72 6f 6f 6b 2e 65 64 75 0d 0a    www3.cs.stonybrook.edu..
+41 63 63 65 70 74 3a 20  74 65 78 74 2f 68 74 6d 6c 2c 61 70 70 6c 69 63    Accept: text/html,applic
+61 74 69 6f 6e 2f 78 68  74 6d 6c 2b 78 6d 6c 2c 61 70 70 6c 69 63 61 74    ation/xhtml+xml,applicat
+69 6f 6e 2f 78 6d 6c 3b  71 3d 30 2e 39 2c 2a 2f 2a 3b 71 3d 30 2e 38 0d    ion/xml;q=0.9,*/*;q=0.8.
+0a 55 70 67 72 61 64 65  2d 49 6e 73 65 63 75 72 65 2d 52 65 71 75 65 73    .Upgrade-Insecure-Reques
+74 73 3a 20 31 0d 0a 43  6f 6f 6b 69 65 3a 20 5f 5f 75 74 6d 61 3d 31 30    ts: 1..Cookie: __utma=10
+36 35 30 37 31 34 31 2e  31 34 35 30 32 35 35 35 37 34 2e 31 35 30 33 38    6507141.1450255574.15038
+35 33 32 32 30 2e 31 35  30 37 30 35 38 37 37 35 2e 31 35 30 37 38 34 38    53220.1507058775.1507848
+37 32 30 2e 34 3b 20 5f  5f 75 74 6d 63 3d 31 30 36 35 30 37 31 34 31 3b    720.4; __utmc=106507141;
+20 5f 5f 75 74 6d 7a 3d  31 30 36 35 30 37 31 34 31 2e 31 35 30 37 38 34     __utmz=106507141.150784
+38 37 32 30 2e 34 2e 34  2e 75 74 6d 63 73 72 3d 67 6f 6f 67 6c 65 7c 75    8720.4.4.utmcsr=google|u
+74 6d 63 63 6e 3d 28 6f  72 67 61 6e 69 63 29 7c 75 74 6d 63 6d 64 3d 6f    tmccn=(organic)|utmcmd=o
+72 67 61 6e 69 63 7c 75  74 6d 63 74 72 3d 28 6e 6f 74 25 32 30 70 72 6f    rganic|utmctr=(not%20pro
+76 69 64 65 64 29 3b 20  5f 67 61 3d 47 41 31 2e 32 2e 31 34 35 30 32 35    vided); _ga=GA1.2.145025
+35 35 37 34 2e 31 35 30  33 38 35 33 32 32 30 3b 20 5f 5f 75 74 6d 61 3d    5574.1503853220; __utma=
+37 33 30 38 39 32 33 33  2e 31 34 35 30 32 35 35 35 37 34 2e 31 35 30 33    73089233.1450255574.1503
+38 35 33 32 32 30 2e 31  35 30 36 36 35 33 32 36 39 2e 31 35 30 36 39 35    853220.1506653269.150695
+35 33 34 37 2e 37 3b 20  5f 5f 75 74 6d 63 3d 37 33 30 38 39 32 33 33 3b    5347.7; __utmc=73089233;
+20 5f 5f 75 74 6d 7a 3d  37 33 30 38 39 32 33 33 2e 31 35 30 36 36 35 33     __utmz=73089233.1506653
+32 36 39 2e 36 2e 36 2e  75 74 6d 63 73 72 3d 67 6f 6f 67 6c 65 7c 75 74    269.6.6.utmcsr=google|ut
+6d 63 63 6e 3d 28 6f 72  67 61 6e 69 63 29 7c 75 74 6d 63 6d 64 3d 6f 72    mccn=(organic)|utmcmd=or
+67 61 6e 69 63 7c 75 74  6d 63 74 72 3d 28 6e 6f 74 25 32 30 70 72 6f 76    ganic|utmctr=(not%20prov
+69 64 65 64 29 3b 20 5f  63 65 67 2e 73 3d 6f 78 37 61 36 71 3b 20 5f 63    ided); _ceg.s=ox7a6q; _c
+65 67 2e 75 3d 6f 78 37  61 36 71 0d 0a 55 73 65 72 2d 41 67 65 6e 74 3a    eg.u=ox7a6q..User-Agent:
+20 4d 6f 7a 69 6c 6c 61  2f 35 2e 30 20 28 4d 61 63 69 6e 74 6f 73 68 3b     Mozilla/5.0 (Macintosh;
+20 49 6e 74 65 6c 20 4d  61 63 20 4f 53 20 58 20 31 30 5f 31 32 5f 36 29     Intel Mac OS X 10_12_6)
+20 41 70 70 6c 65 57 65  62 4b 69 74 2f 36 30 34 2e 31 2e 33 38 20 28 4b     AppleWebKit/604.1.38 (K
+48 54 4d 4c 2c 20 6c 69  6b 65 20 47 65 63 6b 6f 29 20 56 65 72 73 69 6f    HTML, like Gecko) Versio
+6e 2f 31 31 2e 30 20 53  61 66 61 72 69 2f 36 30 34 2e 31 2e 33 38 0d 0a    n/11.0 Safari/604.1.38..
+41 63 63 65 70 74 2d 4c  61 6e 67 75 61 67 65 3a 20 65 6e 2d 75 73 0d 0a    Accept-Language: en-us..
+41 63 63 65 70 74 2d 45  6e 63 6f 64 69 6e 67 3a 20 67 7a 69 70 2c 20 64    Accept-Encoding: gzip, d
+65 66 6c 61 74 65 0d 0a  43 6f 6e 6e 65 63 74 69 6f 6e 3a 20 6b 65 65 70    eflate..Connection: keep
+2d 61 6c 69 76 65 0d 0a  0d 0a                      -alive....
+Time: 2017-10-14 03:42:13  Source MAC address: 78:4f:43:a7:21:5d Destination MAC address b8:af:67:63:a3:28 Ethernet Type: 8 Length: 80 66 172.24.18.67: 51949 -> 130.245.27.3: 80 Protocol Type: TCP 
+ca ed 00 50 1e 97 1b e7  24 41 7d fa 80 10 0f c4 6e a3 00 00 01 01 08 0a    ...P....$A}.....n.......
+21 2c e2 8c e8 0f 08 42                             !,.....B
+

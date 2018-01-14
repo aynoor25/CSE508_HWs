@@ -1,0 +1,19 @@
+=> Implemented in Python and Library used Scapy
+
+=> dnsinject:
+
+In main function command line arguments are parsed and bpf filter along with interface is given to the sniffer function. This function sniffs for packets. 
+
+The callback function dns_spoof takes in a packet. It first sets the ip address of spoofer to 172.16.1.63 (my local machines IP). It checks if the packet has DNS layer and it is a query. Then a check is included to see if hostnames have been specified for which spoofing should be done. If yes and the hostname is not in the list then return. Else, move on and make a spoofed packet and send it. In the DNS layer of the packet set the IP to the ip address of spoofer.
+
+
+=> dnsdetect:
+
+In main function the command line arguments are parsed. If tracefile is not specified it sniffs on the interface else on the tracefile.
+
+To detect spoofed packets a dictionary is maintained, seenResponses. In the callback function dns_detect if a query is seen then the DNS id is used as a key and its value is set to None. If a response is seen and if the value is None then for that DNS id the value is set to a list [packet_payload, dns_rdata (IP address)]. If a retransmission has occurred then in the value the ip address is appended. Otherwise a DNS poisoning attempt is detected and the output is printed. It contains the as Answer 1 the IP address of the packet that came in late and a list of IP address of the packets that came before in Answer 2. It is a list because in case retransmission occured all IP addresses of the packets are printed.
+
+Example from tracefile submission.pcap:
+
+For command: dig www.junaidharoonsiddiqui.com
+

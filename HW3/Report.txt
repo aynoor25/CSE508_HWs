@@ -1,0 +1,17 @@
+Report:
+
+=> Citations:
+1) Code for Socket Programming in C/C++ taken from source: http://www.geeksforgeeks.org/socket-programming-cc/
+2) For Select implementation code example understood and partially taken from: https://github.com/syzdek/spear/blob/master/src/garage/c/socket/multi-client-echo-server.c
+3) AES encryption method understood and skeleton code partially taken from: http://www.gurutechnologies.net/blog/aes-ctr-encryption-in-c/
+
+
+=> iencrypt(char* input, char* encrypted_output, int indata_len, const unsigned char* enc_key): this methods encrypts input data using AES_ctr128_encrypt
+
+=> idecrypt(char* input, char* decrypted_output, int indata_len, const unsigned char* enc_key): this method decrypts input data using AES_ctr128_encrypt, the input data is the encrypted message and the same IV is used to decrypt it to obtain the plain text.
+
+=> start_client(struct sockaddr_in ssh_server_address): starts the client which on first connection to server sends the IV. Then it waits for user input, once received, pbproxy encrypts it and sends it to server. If a message is received from server it is decrypted by pbproxy and displayed.
+
+=> start_server(struct sockaddr_in pbproxy_server_addr, struct sockaddr_in ssh_server_addr): start sthe pbproxy server and the backend service server. A echo server is used to test code. On a new connection IV is received and saved. IF a message is received from a client then it is first decrypted then sent back to the server, otherwise, while sending message to client the message is first encrypted and sent to client.
+
+=> main(int argc, char *argv[]): getopt is used to parse input arguments from command line and pbproxy decided if the server side is trying to run it or client and accordingly start_server and start_client methods are called.
